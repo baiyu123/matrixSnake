@@ -1,10 +1,11 @@
 #pragma once
+#include <ArduinoSTL.h>
 #include <deque>
 #include <vector>
 
-class snake{
+class Snake{
 public:
-    snake(int x, int y, int vX, int vY);
+    Snake(int x, int y);
     void move();
     void moveAndGrow();
     void turnLeft();
@@ -12,10 +13,16 @@ public:
     std::vector<std::vector<int> > getMap();
     void getMapBinary(uint8_t board[]);
     std::pair<int, int> getHead();
+    enum Direction{
+        UP,
+        RIGHT,
+        DOWN,
+        LEFT
+    };
 private:
-    void multiplyOrient(std::vector<std::vector<int> > v);
+    std::pair<int, int> getNextPointRelToHead();
     int width = 8;
     int height = 8;
     std::deque<std::pair<int, int> > pos;
-    std::pair<int, int> currOrient;
+    Direction currOrient;
 };

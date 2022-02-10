@@ -2,26 +2,44 @@
 #include "matrixUtility.h"
 #include <vector>
 #include <iostream>
+#include <SoftwareSerial.h>
 
 using namespace std;
 
-snake::snake(int x, int y, int vX, int vY){
+Snake::Snake(int x, int y){
+    currOrient = Direction::RIGHT;
+    auto nextPos = Snake::getNextPointRelToHead();
     pair<int, int> s1(x,y);
-    pair<int, int> s2(x-vX,y-vY);
+    pair<int, int> s2(x+nextPos.first,y+nextPos.second);
     pos.push_back(s1);
     pos.push_back(s2);
-    currOrient.first = vX;
-    currOrient.second = vY;
 }
 
-void snake::move(){
+std::pair<int, int> Snake::getNextPointRelToHead(){
+    switch(currOrient)
+    {
+        case Direction::UP:
+            return make_pair<int, int>(-1,0);
+        case Direction::RIGHT:
+            return make_pair<int, int>(0,1);
+        case Direction::DOWN:
+            return make_pair<int, int>(1,0);
+        case Direction::LEFT:
+            return make_pair<int, int>(0,-1);
+        default:
+          return make_pair<int, int>(0,-1);
+    }
+}
+
+void Snake::move(){
     moveAndGrow();
     pos.pop_back();
 }
 
-void snake::moveAndGrow(){
-    int nextX = pos[0].first + currOrient.first;
-    int nextY = pos[0].second + currOrient.second;
+void Snake::moveAndGrow(){
+    auto nextPos = getNextPointRelToHead();
+    int nextX = pos[0].first + nextPos.first;
+    int nextY = pos[0].second + nextPos.second;
     if(nextX >= width){
         nextX = 0;
     }
@@ -46,29 +64,16 @@ void snake::moveAndGrow(){
     }
 }
 
-void snake::turnLeft(){
-    vector<vector<int> > mat1 = {{0, -1},
-        {1, 0}};
-    multiplyOrient(mat1);
+void Snake::turnLeft(){
+    currOrient = (currOrient+3)%4;
+    Serial.println(currOrient);
 }
 
-void snake::turnRight(){
-    vector<vector<int> > mat1 = {{0, 1},
-        {-1, 0}};
-    multiplyOrient(mat1);
+void Snake::turnRight(){
+    currOrient = (currOrient+1)%4;
 }
 
-void snake::multiplyOrient(vector<std::vector<int> > mat1){
-    vector<vector<int> > mat2 = {{currOrient.first},
-        {currOrient.second}};
-    vector<vector<int> > mat3 = {{0},
-        {0}};
-    multiplyMat(mat1, mat2, mat3);
-    currOrient.first = mat3[0][0];
-    currOrient.second = mat3[1][0];
-}
-
-void snake::getMapBinary(uint8_t board[]){
+void Snake::getMapBinary(uint8_t board[]){
     for(int i = 0; i < width; i++){
         board[i] = 0;
     }
@@ -80,7 +85,7 @@ void snake::getMapBinary(uint8_t board[]){
     }
 }
 
-vector<vector<int> > snake::getMap(){
+vector<vector<int> > Snake::getMap(){
     vector<vector<int> > board=  {
         {0, 0, 0, 0, 0, 0, 0, 0},
         {0, 0, 0, 0, 0, 0, 0, 0},
@@ -99,6 +104,6 @@ vector<vector<int> > snake::getMap(){
 }
 
 //get the head of snake
-pair<int, int> snake::getHead(){
+pair<int, int> Snake::getHead(){
     return pos[0];
 }
