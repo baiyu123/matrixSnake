@@ -10,7 +10,7 @@ Snake::Snake(int x, int y){
     currOrient = Direction::RIGHT;
     auto nextPos = Snake::getNextPointRelToHead();
     pair<int, int> s1(x,y);
-    pair<int, int> s2(x+nextPos.first,y+nextPos.second);
+    pair<int, int> s2(x-nextPos.first,y-nextPos.second);
     pos.push_back(s1);
     pos.push_back(s2);
 }
@@ -66,7 +66,6 @@ void Snake::moveAndGrow(){
 
 void Snake::turnLeft(){
     currOrient = (currOrient+3)%4;
-    Serial.println(currOrient);
 }
 
 void Snake::turnRight(){

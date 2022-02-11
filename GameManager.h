@@ -9,7 +9,7 @@ class GameManager{
         GameManager();
         GameManager(Adafruit_8x8matrix* matrix, uint8_t board[]);
         void OnGameStart();
-        void Update();
+        void Update(unsigned long);
         void PressLeft();
         void PressRight();
         void ClearPress();
@@ -25,4 +25,5 @@ class GameManager{
         GameState gameState;
         bool leftPressed;
         bool rightPressed;
+        unsigned long lastUpdate;
 };

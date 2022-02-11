@@ -5,6 +5,7 @@ GameManager::GameManager(Adafruit_8x8matrix* matrix, uint8_t board[])
 {
     this->matrix = matrix;
     this->board = board;
+    lastUpdate = 0;
 }
 
 void GameManager::OnGameStart()
@@ -30,28 +31,32 @@ void GameManager::ClearPress()
     rightPressed = false;
 }
 
-void GameManager::Update()
+void GameManager::Update(unsigned long currTime)
 {
-    if(leftPressed){
-        snake.turnLeft();
-    }
-    if(rightPressed){
-        snake.turnRight();
-    }
+    if(currTime - lastUpdate > 500)
+    {
+        if(leftPressed){
+            snake.turnLeft();
+        }
+        if(rightPressed){
+            snake.turnRight();
+        }
 
-    std::pair<int, int> head = snake.getHead();
-    if(food.checkEat(head)){
-        snake.moveAndGrow();
-        snake.getMapBinary(board); 
-        food.generateFood(board);
+        std::pair<int, int> head = snake.getHead();
+        if(food.checkEat(head)){
+            snake.moveAndGrow();
+            snake.getMapBinary(board); 
+            food.generateFood(board);
+        }
+        else{
+            snake.move();
+            snake.getMapBinary(board); 
+        }
+        food.drawLastFood(board);
+        matrix->clear();
+        matrix->drawBitmap(0, 0, board, 8, 8, LED_ON);
+        matrix->writeDisplay();
+        ClearPress();
+        lastUpdate = currTime;
     }
-    else{
-        snake.move();
-        snake.getMapBinary(board); 
-    }
-    food.drawLastFood(board);
-    matrix->clear();
-    matrix->drawBitmap(0, 0, board, 8, 8, LED_ON);
-    matrix->writeDisplay();
-    ClearPress();
 }
